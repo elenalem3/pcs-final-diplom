@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class BooleanSearchEngine implements SearchEngine {
-    protected static Map<String, List<PageEntry>> wordsMap = new HashMap<>();
+    protected Map<String, List<PageEntry>> wordsMap = new HashMap<>();
 
     public BooleanSearchEngine(File pdfsDir) throws IOException {
         File[] allOfPdfs = pdfsDir.listFiles();
@@ -23,13 +23,14 @@ public class BooleanSearchEngine implements SearchEngine {
                             continue;
                         }
                         word = word.toLowerCase();
-                        freqs.put(word, freqs.getOrDefault(word, 0) + 1);
+                        freqs.put(word, freqs.getOrDefault(word, 0) + 1); //добавляем в мапу слова в нижнем регистре
                     }
-                    for (var word : freqs.keySet()) {
+                    for (var word : freqs.keySet()) { //перебираем мапу по сету ключ-слово-количество
                         int page = i;
                         List<PageEntry> pageList = new ArrayList<>();
                         if (!wordsMap.containsKey(word)) {
                             pageList.add(new PageEntry(file.getName(), page, freqs.get(word)));
+                            pageList.sort(PageEntry::compareTo);
                             wordsMap.put(word, pageList);
                         } else {
                             List<PageEntry> entryList = wordsMap.get(word);
@@ -48,7 +49,6 @@ public class BooleanSearchEngine implements SearchEngine {
         String wordReg = word.toLowerCase(); //преобразуем все символы слова в нижний регистр
         List<PageEntry> pageEntryList = wordsMap.getOrDefault(wordReg, Collections.emptyList());
 
-        Collections.sort(pageEntryList);
         return pageEntryList;
     }
 }
